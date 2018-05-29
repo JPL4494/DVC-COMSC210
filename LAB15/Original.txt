@@ -1,0 +1,65 @@
+pair<stack<int>, double> result;
+  list<pair<int, double> >::iterator it; /// to iterate over adjacentVertices
+  /// TO DO -- write this function
+
+  ///set cost=0 and previous index=-1 for all vertices, and mark all as not visited
+  for(int i = 0; i < database.size(); i++)
+  {
+    database[i].isVisited = false;
+    database[i].prev = -1;
+    database[i].cost = 0;
+  }
+  ///create a queue to store "vertices to consider"
+  queue<int> toConsider;
+  ///mark start vertex as "visited" and push it onto the "vertices to consider" queue
+  database[iStart].isVisited = true;
+  toConsider.push(iStart);
+  ///while the "vertices to consider" queue is not empty
+  while(toConsider.empty() == false)
+  {
+    ///peek/pop a vertex from the "vertices to consider" queue
+    int temp = toConsider.front();
+    toConsider.pop();
+    ///for each of that vertex's neighbors
+    for(list<pair<int, double> > i = database[temp].adjacentVertices; !i.empty(); i.pop_front())
+    {
+      pair<int, double> j = i.front();
+      ///if neighbor has not yet been visited
+      if(database[j.first].isVisited == false)
+      {
+        ///mark neighbor as visited
+        database[j.first].isVisited = true;
+        ///set neighbor's cost to 1+cost of vertex under consideration
+        database[j.first].cost = database[temp].cost + 1;
+        ///set neighbor's previous vertex to the vertex under consideration
+        database[j.first].prev = temp;
+        ///push neighbor into the "vertices to consider" queue
+        toConsider.push(j.first);
+      }
+      ///if neighbor vertex contains the index of the end city
+      if(j.first == iEnd)
+      {
+        int size = toConsider.size();
+        for(int i = 0; i < size; i++)
+          toConsider.pop();
+        ///empty the "vertices to consider" queue
+      }
+    }///exit for-loop
+  }
+
+  ///the route's cost equals the end vertex's cost
+  result.second = database[iEnd].cost;
+  ///build a stack of entries, starting from the end vertex, back towards the start
+  bool good = false;
+  int index = iEnd;
+  while(!good)
+  {
+    if(index == iStart)good = true;
+    else
+    {
+      result.first.push(index);
+      index = database[index].prev;
+    }
+  }
+
+  return result;
